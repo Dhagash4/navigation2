@@ -42,6 +42,23 @@ endforeach()
 
 set(library_name ${PROJECT_NAME})
 
+set(dependencies 
+  geometry_msgs
+  nav2_util
+  nav2_lifecycle_manager
+  nav2_msgs
+  rclcpp
+  rclcpp_action
+  rviz_common
+  rviz_default_plugins
+  rviz_rendering
+  std_msgs
+  tf2_geometry_msgs
+  yaml_cpp_vendor
+  visualization_msgs
+  ament_index_cpp
+  pluginlib)
+
 add_library(${library_name} SHARED
   src/costmap_cost_tool.cpp
   src/docking_panel.cpp
@@ -59,25 +76,24 @@ target_include_directories(${library_name} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
-target_link_libraries(${library_name} PUBLIC
-  ${geometry_msgs_TARGETS}
-  nav2_lifecycle_manager::nav2_lifecycle_manager_core
-  ${nav2_msgs_TARGETS}
-  nav2_util::nav2_util_core
-  rclcpp::rclcpp
-  rclcpp_action::rclcpp_action
-  rviz_common::rviz_common
-  rviz_default_plugins::rviz_default_plugins
-  rviz_rendering::rviz_rendering
-  ${std_msgs_TARGETS}
-  tf2_geometry_msgs::tf2_geometry_msgs
-  ${visualization_msgs_TARGETS}
+# target_link_libraries(${library_name} PUBLIC
+#   ${geometry_msgs_TARGETS}
+#   nav2_lifecycle_manager::nav2_lifecycle_manager_core
+#   ${nav2_msgs_TARGETS}
+#   nav2_util::nav2_util_core
+#   rclcpp::rclcpp
+#   rclcpp_action::rclcpp_action
+#   rviz_common::rviz_common
+#   rviz_default_plugins::rviz_default_plugins
+#   rviz_rendering::rviz_rendering
+#   ${std_msgs_TARGETS}
+#   tf2_geometry_msgs::tf2_geometry_msgs
+#   ${visualization_msgs_TARGETS}
+# )
+ament_target_dependencies(${library_name}
+  ${dependencies}
 )
-target_link_libraries(${library_name} PRIVATE
-  ament_index_cpp::ament_index_cpp
-  pluginlib::pluginlib
-  yaml-cpp::yaml-cpp
-)
+
 
 pluginlib_export_plugin_description_file(rviz_common plugins_description.xml)
 

@@ -46,18 +46,20 @@ target_include_directories(nav2_costmap_2d_core
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
-target_link_libraries(nav2_costmap_2d_core PUBLIC
-  ${geometry_msgs_TARGETS}
-  ${map_msgs_TARGETS}
-  ${nav_msgs_TARGETS}
-  ${nav2_msgs_TARGETS}
-  nav2_util::nav2_util_core
-  pluginlib::pluginlib
-  ${std_srvs_TARGETS}
-  tf2::tf2
-  tf2_ros::tf2_ros
-  tf2_sensor_msgs::tf2_sensor_msgs
+set(nav2_costmap_2d_core_dependencies
+  geometry_msgs
+  map_msgs
+  nav_msgs
+  nav2_msgs
+  nav2_util
+  pluginlib
+  std_srvs
+  tf2_ros
+  tf2_sensor_msgs
 )
+
+ament_target_dependencies(nav2_costmap_2d_core ${nav2_costmap_2d_core_dependencies})
+
 
 add_library(layers SHARED
   plugins/inflation_layer.cpp
@@ -74,18 +76,17 @@ target_include_directories(layers
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
-target_link_libraries(layers PUBLIC
-  angles::angles
-  rclcpp::rclcpp
-  message_filters::message_filters
-  laser_geometry::laser_geometry
-  nav2_voxel_grid::voxel_grid
-  nav2_costmap_2d_core
-  tf2::tf2
-)
-target_link_libraries(layers PRIVATE
-  pluginlib::pluginlib
-)
+
+set(layers_dependencies
+angles
+rclcpp
+message_filters
+laser_geometry
+nav2_voxel_grid
+tf2)
+
+ament_target_dependencies(layers ${layers_dependencies})
+target_link_libraries(layers nav2_costmap_2d_core)
 
 add_library(filters SHARED
   plugins/costmap_filters/keepout_filter.cpp
@@ -97,11 +98,12 @@ target_include_directories(filters
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
-target_link_libraries(filters PUBLIC
-  nav2_costmap_2d_core
-  ${std_msgs_TARGETS}
-  tf2::tf2
-)
+
+set(filter_dependencies
+  std_msgs
+  tf2)
+ament_target_dependencies(filters ${filter_dependencies})
+target_link_libraries(filters nav2_costmap_2d_core)
 
 add_library(nav2_costmap_2d_client SHARED
   src/footprint_subscriber.cpp
@@ -113,36 +115,39 @@ target_include_directories(nav2_costmap_2d_client
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
-target_link_libraries(nav2_costmap_2d_client PUBLIC
-  nav2_costmap_2d_core
-  ${std_msgs_TARGETS}
-  tf2::tf2
-)
+
+set(nav2_costmap_2d_client_dependencies
+  std_msgs
+  tf2)
+ament_target_dependencies(nav2_costmap_2d_client ${nav2_costmap_2d_client_dependencies})
+target_link_libraries(nav2_costmap_2d_client nav2_costmap_2d_core)
 
 add_executable(nav2_costmap_2d_markers src/costmap_2d_markers.cpp)
-target_link_libraries(nav2_costmap_2d_markers PRIVATE
-  ${nav2_msgs_TARGETS}
-  nav2_voxel_grid::voxel_grid
-  nav2_util::nav2_util_core
-  rclcpp::rclcpp
-  ${visualization_msgs_TARGETS}
-)
+set(nav2_costmap_2d_markers_dependencies
+  nav2_msgs
+  nav2_voxel_grid
+  nav2_util
+  rclcpp
+  visualization_msgs)
+ament_target_dependencies(nav2_costmap_2d_markers ${nav2_costmap_2d_markers_dependencies})
 
 add_executable(nav2_costmap_2d_cloud src/costmap_2d_cloud.cpp)
-target_link_libraries(nav2_costmap_2d_cloud PRIVATE
-  nav2_voxel_grid::voxel_grid
-  ${nav2_msgs_TARGETS}
-  nav2_util::nav2_util_core
-  rclcpp::rclcpp
-  ${sensor_msgs_TARGETS}
-  ${std_msgs_TARGETS}
-)
+set(nav2_costmap_2d_cloud_dependencies
+  nav2_voxel_grid
+  nav2_msgs
+  nav2_util
+  rclcpp
+  sensor_msgs
+  std_msgs)
+ament_target_dependencies(nav2_costmap_2d_cloud ${nav2_costmap_2d_cloud_dependencies})
 
 add_executable(nav2_costmap_2d src/costmap_2d_node.cpp)
-target_link_libraries(nav2_costmap_2d PRIVATE
-  rclcpp::rclcpp
-  nav2_costmap_2d_core
-)
+set(nav2_costmap_2d_dependencies
+  rclcpp)
+
+ament_target_dependencies(nav2_costmap_2d ${nav2_costmap_2d_dependencies})
+target_link_libraries(nav2_costmap_2d nav2_costmap_2d_core)
+
 
 install(TARGETS
   layers

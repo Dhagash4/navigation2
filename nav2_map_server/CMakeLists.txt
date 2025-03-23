@@ -32,6 +32,11 @@ set(map_saver_server_executable map_saver_server)
 
 set(costmap_filter_info_server_executable costmap_filter_info_server)
 
+set(map_io_dependencies GRAPHICSMAGICKCPP yaml_cpp_vendor nav_msgs nav2_util tf2)
+
+set(map_server_dependencies nav_msgs nav2_msgs nav2_util rclcpp rclcpp_components rclcpp_lifecycle lifecycle_msgs yaml_cpp_vendor)
+
+
 add_library(${map_io_library_name} SHARED
   src/map_mode.cpp
   src/map_io.cpp)
@@ -42,15 +47,9 @@ target_include_directories(${map_io_library_name}
 target_include_directories(${map_io_library_name}
   PRIVATE
   ${GRAPHICSMAGICKCPP_INCLUDE_DIRS})
-target_link_libraries(${map_io_library_name} PUBLIC
-  nav2_util::nav2_util_core
-  ${nav_msgs_TARGETS}
-)
-target_link_libraries(${map_io_library_name} PRIVATE
-  ${GRAPHICSMAGICKCPP_LIBRARIES}
-  tf2::tf2
-  yaml-cpp::yaml-cpp
-)
+
+ament_target_dependencies(${map_io_library_name} ${map_io_dependencies})
+
 
 add_library(${library_name} SHARED
   src/map_server/map_server.cpp
@@ -60,19 +59,8 @@ target_include_directories(${library_name}
   PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-target_link_libraries(${library_name} PUBLIC
-  ${map_io_library_name}
-  ${nav_msgs_TARGETS}
-  ${nav2_msgs_TARGETS}
-  nav2_util::nav2_util_core
-  rclcpp::rclcpp
-  rclcpp_lifecycle::rclcpp_lifecycle
-)
-target_link_libraries(${library_name} PRIVATE
-  ${lifecycle_msgs_TARGETS}
-  rclcpp_components::component
-  yaml-cpp::yaml-cpp
-)
+ament_target_dependencies(${library_name} ${map_server_dependencies})
+target_link_libraries(${library_name} ${map_io_library_name})
 
 add_executable(${map_server_executable}
   src/map_server/main.cpp)
